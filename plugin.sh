@@ -102,6 +102,12 @@ fi
 
 if [[ "${PLUGIN_NO_PUSH:-}" == "true" ]]; then
     NO_PUSH="--no-push"
+    # Cache is not valid with --no-push
+    CACHE=""
+fi
+
+if [ -n "${PLUGIN_LABEL:-}" ]; then
+    LABEL=$(echo "${PLUGIN_LABEL}" | tr ',' '\n' | while read label; do echo "--label=${label}"; done)
 fi
 
 /kaniko/executor -v ${LOG} \
@@ -117,4 +123,5 @@ fi
     ${BUILD_ARGS:-} \
     ${BUILD_ARGS_FROM_ENV:-} \
     ${SKIP_TLS_VERIFY:-} \
-    ${NO_PUSH:-}
+    ${NO_PUSH:-} \
+    ${LABEL:-}
