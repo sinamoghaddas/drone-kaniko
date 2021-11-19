@@ -28,14 +28,14 @@ fi
 DOCKERFILE=${PLUGIN_DOCKERFILE:-Dockerfile}
 CONTEXT=${PLUGIN_CONTEXT:-$PWD}
 LOG=${PLUGIN_LOG:-info}
-EXTRA_OPTS=""
+EXTRA_OPTS=${EXTRA_OPTS:-}
 
 if [[ -n "${PLUGIN_TARGET:-}" ]]; then
     TARGET="--target=${PLUGIN_TARGET}"
 fi
 
 if [[ "${PLUGIN_SKIP_TLS_VERIFY:-}" == "true" ]]; then
-    EXTRA_OPTS="--skip-tls-verify=true"
+    SKIP_TLS_VERIFY="--skip-tls-verify=true"
 fi
 
 if [[ "${PLUGIN_CACHE:-}" == "true" ]]; then
@@ -48,6 +48,10 @@ fi
 
 if [ -n "${PLUGIN_CACHE_TTL:-}" ]; then
     CACHE_TTL="--cache-ttl=${PLUGIN_CACHE_TTL}"
+fi
+
+if [ -n "${PLUGIN_CACHE_DIR:-}" ]; then
+    CACHE_DIR="--cache-dir=${PLUGIN_CACHE_DIR}"
 fi
 
 if [ -n "${PLUGIN_BUILD_ARGS:-}" ]; then
@@ -96,6 +100,10 @@ else
     CACHE=""
 fi
 
+if [[ "${PLUGIN_NO_PUSH:-}" == "true" ]]; then
+    NO_PUSH="--no-push"
+fi
+
 /kaniko/executor -v ${LOG} \
     --context=${CONTEXT} \
     --dockerfile=${DOCKERFILE} \
@@ -104,6 +112,9 @@ fi
     ${CACHE:-} \
     ${CACHE_TTL:-} \
     ${CACHE_REPO:-} \
+    ${CACHE_DIR:-} \
     ${TARGET:-} \
     ${BUILD_ARGS:-} \
-    ${BUILD_ARGS_FROM_ENV:-}
+    ${BUILD_ARGS_FROM_ENV:-} \
+    ${SKIP_TLS_VERIFY:-} \
+    ${NO_PUSH:-}
